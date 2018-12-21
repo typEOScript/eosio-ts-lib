@@ -1,7 +1,7 @@
 /**
  * @brief Name of an account
  */
-import {checksum256} from "./types";
+import {checksum256} from "../src/types";
 
 declare type account_name = u64;
 
@@ -38,3 +38,5 @@ declare type weight_type = u16;
 declare type transaction_id_type = checksum256;
 
 declare type block_id_type = checksum256;
+
+declare type symbol_name = u64;

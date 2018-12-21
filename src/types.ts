@@ -1,4 +1,4 @@
-import {account_name, permission_name} from "./alias";
+import {account_name, permission_name} from "../lib/types";
 
 export class public_key {
     data: u8[] = new Array<u8>(34);

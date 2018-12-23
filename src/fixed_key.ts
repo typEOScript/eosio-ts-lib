@@ -1,3 +1,3 @@
-export class fixed_key {
+export class fixed_key{
 
 }

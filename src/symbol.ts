@@ -66,7 +66,7 @@ export function symbol_name_length(sym: symbol_name): u32 {
 }
 
 /**
- * \struct Stores information about a symbol
+ * struct Stores information about a symbol
  *
  * @brief Stores information about a symbol
  */
@@ -94,8 +94,11 @@ export class symbol_type {
     }
 
     print(show_precision: bool = true): void {
-        if (show_precision) {
+        if( show_precision ) {
         }
     }
+
+
 }
 
+export const CORE_SYMBOL = new symbol_type("EOS");

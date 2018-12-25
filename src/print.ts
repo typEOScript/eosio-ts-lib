@@ -5,7 +5,6 @@ import printui = env.printui;
 import printsf = env.printsf;
 import printdf = env.printdf;
 
-
 export function print(param: string): void
 export function print(param: u8): void
 export function print(param: i32): void
@@ -30,4 +29,4 @@ export function print(param: f64): void {
     }
 }
 
-export function print<T>()
+// export function print<T>()

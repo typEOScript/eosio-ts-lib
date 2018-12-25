@@ -1,8 +1,11 @@
-import {symbol_name} from '../lib/types';
-import {env as printAPI} from '../lib/print';
+import {account_name, symbol_name} from '../lib/types';
+import {print} from '../src/print';
+import {Name} from "./name";
 
-const A_CHAR_CODE = 'A'.charCodeAt(0);
-const Z_CHAR_CODE = 'B'.charCodeAt(0);
+export const A_CHAR_CODE = 'A'.charCodeAt(0);
+export const Z_CHAR_CODE = 'B'.charCodeAt(0);
+
+export const CORE_SYMBOL = string_to_symbol(4, "EOS");
 
 /**
  * Converts string to uint64_t representation of symbol
@@ -27,29 +30,6 @@ export function string_to_symbol(precision: u8, str: string): u64 {
 }
 
 /**
- * Checks if provided symbol name is valid.
- *
- * @param sym - symbol name of type symbol_name
- * @return true - if symbol is valid
- */
-export function is_valid_symbol(sym: symbol_name): bool {
-    sym >>= 8;
-    for (let i: u8 = 0; i < 7; i++) {
-        let c: u8 = <u8>(sym & 0xff);
-        if (!(A_CHAR_CODE <= c && c <= Z_CHAR_CODE)) return false;
-        sym >>= 8;
-        if (!(sym & 0xff)) {
-            do {
-                sym >>= 8;
-                if (sym & 0xff) return false;
-                i++;
-            } while (i < 7)
-        }
-    }
-    return true;
-}
-
-/**
  * Returns the character length of the provided symbol
  *
  * @param sym - symbol to retrieve length for (uint64_t)
@@ -66,39 +46,179 @@ export function symbol_name_length(sym: symbol_name): u32 {
 }
 
 /**
- * struct Stores information about a symbol
- *
- * @brief Stores information about a symbol
+ * \struct Stores the symbol code
+ * @brief Stores the symbol code
  */
-export class symbol_type {
+export class symbol_code {
     private _value: symbol_name;
 
     constructor(s: symbol_name) {
         this._value = s;
     }
 
+    /**
+     * Checks if the symbol code is valid
+     * @return true - if symbol is valid
+     */
     is_valid(): bool {
-        return is_valid_symbol(this._value);
+        let sym = this._value;
+        sym >>= 8;
+        for (let i: u8 = 0; i < 7; i++) {
+            let c: u8 = <u8>(sym & 0xff);
+            if (!(A_CHAR_CODE <= c && c <= Z_CHAR_CODE)) return false;
+            sym >>= 8;
+            if (!(sym & 0xff)) {
+                do {
+                    sym >>= 8;
+                    if (sym & 0xff) return false;
+                    i++;
+                } while (i < 7)
+            }
+        }
+        return true
+    }
+
+    raw(): symbol_name {
+        return this._value;
+    }
+
+    length(): u32 {
+        let sym = this._value;
+        sym >>= 8;
+        let length: u32 = 0;
+        while (sym & 0xff && length <= 7) {
+            length++;
+            sym >>= 8;
+        }
+        return length;
+    }
+
+    // print(show_precision: bool = true): void {
+    //     if (show_precision) {
+    //         print(this.precision());
+    //         printAPI.prints(",")
+    //     }
+    //
+    //     let sym = this._value;
+    //     sym >> 8;
+    //     for (let i = 0; i < 7; i++) {
+    //         let c = <u8>(sym & 0xff);
+    //         if (!c) return;
+    //         printAPI.prints(String.fromCharCode(c));
+    //         sym >> 8;
+    //     }
+    // }
+
+    // /**
+    //  *  Writes the symbol_code as a string to the provided char buffer
+    //  *
+    //  *
+    //  *  @brief Writes the symbol_code as a string to the provided char buffer
+    //  *  @pre Appropriate Size Precondition: (begin + 7) <= end and (begin + 7) does not overflow
+    //  *  @pre Valid Memory Region Precondition: The range [begin, end) must be a valid range of memory to write to.
+    //  *  @param begin - The start of the char buffer
+    //  *  @param end - Just past the end of the char buffer
+    //  *  @return char* - Just past the end of the last character written (returns begin if the Appropriate Size Precondition is not satisfied)
+    //  *  @post If the Appropriate Size Precondition is satisfied, the range [begin, returned pointer) contains the string representation of the symbol_code.
+    //  */
+    // write_as_string(begin: usize, end: usize): string {
+    //     let mask: u64 = 0xffffffffffffffff;
+    //
+    //     if ((begin + 7) < begin || (begin + 7) > end) return begin;
+    // }
+
+    toString(): string {
+        let buffer: string[] = new Array(7);
+        let v = this._value;
+        for (let i = 0; i < 7 && v !== 0; i++, v >>= 8) {
+            buffer[i] = String.fromCharCode(v & 0xff)
+        }
+        return buffer.join('');
+    }
+
+    equal(t: symbol_code) {
+        return this._value === t._value;
+    }
+
+    less(t: symbol_code) {
+        return this._value < t._value;
+    }
+}
+
+export class Symbol {
+    private _value: u64 = 0;
+
+    // TODO: overload
+    constructor(v: u64) {
+        this._value = v;
     }
 
     precision(): u64 {
         return this._value & 0xff;
     }
 
-    name(): symbol_name {
-        return this._value >> 8;
+    code(): symbol_code {
+        return new symbol_code(this._value >> 8);
     }
 
-    name_length(): u32 {
-        return symbol_name_length(this._value);
+    is_valid(): bool {
+        return this.code().is_valid();
+    }
+
+    raw(): u64 {
+        return this._value;
     }
 
     print(show_precision: bool = true): void {
-        if( show_precision ) {
+        if (show_precision) {
+            print(this.precision());
+            print(",")
         }
+
+        let sym = this.code().toString();
+        if (sym.length > 0) print(sym);
     }
 
+    equal(t: Symbol): bool {
+        return this._value === t._value;
+    }
 
+    less(t: Symbol): bool {
+        return this._value < t._value;
+    }
 }
 
-export const CORE_SYMBOL = new symbol_type("EOS");
+export class extended_symbol {
+    contract: Name;
+    symbol: Symbol;
+
+    constructor(sym: symbol_name = 0, acc: account_name = 0) {
+        this.contract = acc;
+    }
+
+    print(show_precision: bool = true): void {
+        this.print();
+        print("@");
+        print(this.contract);
+    }
+
+    get_symbol(): Symbol {
+        return this.symbol;
+    }
+
+    get_contract(): Name {
+        return this.contract;
+    }
+
+    /**
+     * Equivalency helper function. Returns true if this == t (are the same)
+     *
+     * @brief Subtraction operator
+     * @param t - The extended asset to be compared
+     * @return boolean - true if both provided symbols are the same
+     */
+    equal(t: extended_symbol): bool {
+        return this.symbol.equal(t.symbol) && this.contract.equal(t.contract);
+    }
+
+}

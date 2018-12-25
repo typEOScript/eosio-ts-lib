@@ -1,4 +1,4 @@
-import {account_name, table_name} from "./types";
+import {capi_name} from './types';
 
 export declare namespace env {
     /**
@@ -17,7 +17,7 @@ export declare namespace env {
      *  @return iterator to the newly created table row
      *  @post a new entry is created in the table
      */
-    function db_store_i64(scope: account_name, table: table_name, payer: account_name, id: u64, data: usize, len: u32): i32;
+    function db_store_i64(scope: u64, table: capi_name, payer: capi_name, id: u64, data: usize, len: u32): i32;
 
     /**
      *
@@ -33,7 +33,7 @@ export declare namespace env {
      *  @pre `iterator` points to an existing table row in the table
      *  @post the record contained in the table row pointed to by `iterator` is replaced with the new updated record
      */
-    function db_update_i64(iterator: i32, payer: account_name, data: usize, len: u32): void;
+    function db_update_i64(iterator: i32, payer: capi_name, data: usize, len: u32): void;
 
     /**
      *
@@ -138,7 +138,7 @@ export declare namespace env {
      *  int itr = db_find_i64(receiver, receiver, table1, N(charlie));
      *  @endcode
      */
-    function db_find_i64(code: account_name, scope: account_name, table: table_name, id: u64): i32;
+    function db_find_i64(code: capi_name, scope: u64, table: capi_name, id: u64): i32;
 
     /**
      *
@@ -152,7 +152,7 @@ export declare namespace env {
      *  @param id - The primary key used to determine the lowerbound
      *  @return iterator to the found table row or the end iterator of the table if the table row could not be found
      */
-    function db_lowerbound_i64(code: account_name, scope: account_name, table: table_name, id: u64): i32;
+    function db_lowerbound_i64(code: capi_name, scope: u64, table: capi_name, id: u64): i32;
 
     /**
      *
@@ -166,7 +166,7 @@ export declare namespace env {
      *  @param id - The primary key used to determine the upperbound
      *  @return iterator to the found table row or the end iterator of the table if the table row could not be found
      */
-    function db_upperbound_i64(code: account_name, scope: account_name, table: table_name, id: u64): i32;
+    function db_upperbound_i64(code: capi_name, scope: u64, table: capi_name, id: u64): i32;
 
     /**
      *
@@ -178,7 +178,7 @@ export declare namespace env {
      *  @param table - The table name
      *  @return end iterator of the table
      */
-    function db_end_i64(code: account_name, scope: account_name, table: table_name): i32;
+    function db_end_i64(code: capi_name, scope: u64, table: capi_name): i32;
 
     /**
      *
@@ -193,7 +193,7 @@ export declare namespace env {
      *  @return iterator to the newly created table row
      *  @post new secondary key association between primary key `id` and secondary key `*secondary` is created in the secondary 64-bit integer index table
      */
-    function db_idx64_store(scope: account_name, table: table_name, payer: account_name, id: u64, secondary: usize): i32;
+    function db_idx64_store(scope: u64, table: capi_name, payer: capi_name, id: u64, secondary: usize): i32;
 
     /**
      *
@@ -206,7 +206,7 @@ export declare namespace env {
      *  @pre `iterator` points to an existing table row in the table
      *  @post the secondary key of the table row pointed to by `iterator` is replaced by `*secondary`
      */
-    function db_idx64_update(iterator: i32, payer: account_name, secondary: usize): void;
+    function db_idx64_update(iterator: i32, payer: capi_name, secondary: usize): void;
 
     /**
      *
@@ -258,7 +258,7 @@ export declare namespace env {
      *  @post If and only if the table row is found, `*secondary` will be replaced with the secondary key of the found table row
      *  @return iterator to the table row with a primary key equal to `id` or the end iterator of the table if the table row could not be found
      */
-    function db_idx64_find_primary(code: account_name, scope: account_name, table: table_name, secondary: usize, primary: u64): i32;
+    function db_idx64_find_primary(code: capi_name, scope: u64, table: capi_name, secondary: usize, primary: u64): i32;
 
     /**
      *
@@ -273,7 +273,7 @@ export declare namespace env {
      *  @post If and only if the table row is found, `*primary` will be replaced with the primary key of the found table row
      *  @return iterator to the first table row with a secondary key equal to `*secondary` or the end iterator of the table if the table row could not be found
      */
-    function db_idx64_find_secondary(code: account_name, scope: account_name, table: table_name, secondary: usize, primary: usize): i32;
+    function db_idx64_find_secondary(code: capi_name, scope: u64, table: capi_name, secondary: usize, primary: usize): i32;
 
     /**
      *
@@ -290,7 +290,7 @@ export declare namespace env {
      *  @post If and only if the table row is found, `*primary` will be replaced with the primary key of the found table row
      *  @return iterator to the found table row or the end iterator of the table if the table row could not be found
      */
-    function db_idx64_lowerbound(code: account_name, scope: account_name, table: table_name, secondary: usize, primary: usize): i32;
+    function db_idx64_lowerbound(code: capi_name, scope: u64, table: capi_name, secondary: usize, primary: usize): i32;
 
     /**
      *
@@ -307,7 +307,7 @@ export declare namespace env {
      *  @post If and only if the table row is found, `*primary` will be replaced with the primary key of the found table row
      *  @return iterator to the found table row or the end iterator of the table if the table row could not be found
      */
-    function db_idx64_upperbound(code: account_name, scope: account_name, table: table_name, secondary: usize, primary: usize): i32;
+    function db_idx64_upperbound(code: capi_name, scope: u64, table: capi_name, secondary: usize, primary: usize): i32;
 
     /**
      *
@@ -319,7 +319,7 @@ export declare namespace env {
      *  @param table - The table name
      *  @return end iterator of the table
      */
-    function db_idx64_end(code: account_name, scope: account_name, table: table_name): i32;
+    function db_idx64_end(code: capi_name, scope: u64, table: capi_name): i32;
 
     /**
      *
@@ -334,7 +334,7 @@ export declare namespace env {
      *  @return iterator to the newly created table row
      *  @post new secondary key association between primary key `id` and secondary key `*secondary` is created in the secondary 128-bit integer index table
      */
-    function db_idx128_store(scope: account_name, table: table_name, payer: account_name, id: u64, secondary: usize): i32;
+    function db_idx128_store(scope: u64, table: capi_name, payer: capi_name, id: u64, secondary: usize): i32;
 
     /**
      *
@@ -347,7 +347,7 @@ export declare namespace env {
      *  @pre `iterator` points to an existing table row in the table
      *  @post the secondary key of the table row pointed to by `iterator` is replaced by `*secondary`
      */
-    function db_idx128_update(iterator: i32, payer: account_name, secondary: usize): void;
+    function db_idx128_update(iterator: i32, payer: capi_name, secondary: usize): void;
 
     /**
      *
@@ -399,7 +399,7 @@ export declare namespace env {
      *  @post If and only if the table row is found, `*secondary` will be replaced with the secondary key of the found table row
      *  @return iterator to the table row with a primary key equal to `id` or the end iterator of the table if the table row could not be found
      */
-    function db_idx128_find_primary(code: account_name, scope: account_name, table: table_name, secondary: usize, primary: u64): i32;
+    function db_idx128_find_primary(code: capi_name, scope: u64, table: capi_name, secondary: usize, primary: u64): i32;
 
     /**
      *
@@ -414,7 +414,7 @@ export declare namespace env {
      *  @post If and only if the table row is found, `*primary` will be replaced with the primary key of the found table row
      *  @return iterator to the first table row with a secondary key equal to `*secondary` or the end iterator of the table if the table row could not be found
      */
-    function db_idx128_find_secondary(code: account_name, scope: account_name, table: table_name, secondary: usize, primary: usize): i32;
+    function db_idx128_find_secondary(code: capi_name, scope: u64, table: capi_name, secondary: usize, primary: usize): i32;
 
     /**
      *
@@ -431,7 +431,7 @@ export declare namespace env {
      *  @post If and only if the table row is found, `*primary` will be replaced with the primary key of the found table row
      *  @return iterator to the found table row or the end iterator of the table if the table row could not be found
      */
-    function db_idx128_lowerbound(code: account_name, scope: account_name, table: table_name, secondary: usize, primary: usize): i32;
+    function db_idx128_lowerbound(code: capi_name, scope: u64, table: capi_name, secondary: usize, primary: usize): i32;
 
     /**
      *
@@ -448,7 +448,7 @@ export declare namespace env {
      *  @post If and only if the table row is found, `*primary` will be replaced with the primary key of the found table row
      *  @return iterator to the found table row or the end iterator of the table if the table row could not be found
      */
-    function db_idx128_upperbound(code: account_name, scope: account_name, table: table_name, secondary: usize, primary: usize): i32;
+    function db_idx128_upperbound(code: capi_name, scope: u64, table: capi_name, secondary: usize, primary: usize): i32;
 
     /**
      *
@@ -460,7 +460,7 @@ export declare namespace env {
      *  @param table - The table name
      *  @return end iterator of the table
      */
-    function db_idx128_end(code: account_name, scope: account_name, table: table_name): i32;
+    function db_idx128_end(code: capi_name, scope: u64, table: capi_name): i32;
 
     /**
      *
@@ -476,7 +476,7 @@ export declare namespace env {
      *  @return iterator to the newly created table row
      *  @post new secondary key association between primary key `id` and the specified secondary key is created in the secondary 256-bit index table
      */
-    function db_idx256_store(scope: account_name, table: table_name, payer: account_name, id: u64, data: usize, data_len: u32): i32;
+    function db_idx256_store(scope: u64, table: capi_name, payer: capi_name, id: u64, data: usize, data_len: u32): i32;
 
     /**
      *
@@ -490,7 +490,7 @@ export declare namespace env {
      *  @pre `iterator` points to an existing table row in the table
      *  @post the secondary key of the table row pointed to by `iterator` is replaced by the specified secondary key
      */
-    function db_idx256_update(iterator: i32, payer: account_name, data: usize, data_len: u32): void;
+    function db_idx256_update(iterator: i32, payer: capi_name, data: usize, data_len: u32): void;
 
     /**
      *
@@ -543,7 +543,7 @@ export declare namespace env {
      *  @post If and only if the table row is found, the buffer pointed to by `data` will be filled with the secondary key of the found table row
      *  @return iterator to the table row with a primary key equal to `id` or the end iterator of the table if the table row could not be found
      */
-    function db_idx256_find_primary(code: account_name, scope: account_name, table: table_name, data: usize, data_len: u32, primary: u64): i32;
+    function db_idx256_find_primary(code: capi_name, scope: u64, table: capi_name, data: usize, data_len: u32, primary: u64): i32;
 
     /**
      *
@@ -559,7 +559,7 @@ export declare namespace env {
      *  @post If and only if the table row is found, `*primary` will be replaced with the primary key of the found table row
      *  @return iterator to the first table row with a secondary key equal to the specified secondary key or the end iterator of the table if the table row could not be found
      */
-    function db_idx256_find_secondary(code: account_name, scope: account_name, table: table_name, data: usize, data_len: u32, primary: usize): i32;
+    function db_idx256_find_secondary(code: capi_name, scope: u64, table: capi_name, data: usize, data_len: u32, primary: usize): i32;
 
     /**
      *
@@ -577,7 +577,7 @@ export declare namespace env {
      *  @post If and only if the table row is found, `*primary` will be replaced with the primary key of the found table row
      *  @return iterator to the found table row or the end iterator of the table if the table row could not be found
      */
-    function db_idx256_lowerbound(code: account_name, scope: account_name, table: table_name, data: usize, data_len: u32, primary: usize): i32;
+    function db_idx256_lowerbound(code: capi_name, scope: u64, table: capi_name, data: usize, data_len: u32, primary: usize): i32;
 
     /**
      *
@@ -595,7 +595,7 @@ export declare namespace env {
      *  @post If and only if the table row is found, `*primary` will be replaced with the primary key of the found table row
      *  @return iterator to the found table row or the end iterator of the table if the table row could not be found
      */
-    function db_idx256_upperbound(code: account_name, scope: account_name, table: table_name, data: usize, data_len: u32, primary: usize): i32;
+    function db_idx256_upperbound(code: capi_name, scope: u64, table: capi_name, data: usize, data_len: u32, primary: usize): i32;
 
     /**
      *
@@ -607,7 +607,7 @@ export declare namespace env {
      *  @param table - The table name
      *  @return end iterator of the table
      */
-    function db_idx256_end(code: account_name, scope: account_name, table: table_name): i32;
+    function db_idx256_end(code: capi_name, scope: u64, table: capi_name): i32;
 
     /**
      *
@@ -622,7 +622,7 @@ export declare namespace env {
      *  @return iterator to the newly created table row
      *  @post new secondary key association between primary key `id` and secondary key `*secondary` is created in the secondary double-precision floating-point index table
      */
-    function db_idx_double_store(scope: account_name, table: table_name, payer: account_name, id: u64, secondary: usize): i32;
+    function db_idx_double_store(scope: u64, table: capi_name, payer: capi_name, id: u64, secondary: usize): i32;
 
     /**
      *
@@ -635,7 +635,7 @@ export declare namespace env {
      *  @pre `iterator` points to an existing table row in the table
      *  @post the secondary key of the table row pointed to by `iterator` is replaced by `*secondary`
      */
-    function db_idx_double_update(iterator: i32, payer: account_name, secondary: usize): void;
+    function db_idx_double_update(iterator: i32, payer: capi_name, secondary: usize): void;
 
     /**
      *
@@ -687,7 +687,7 @@ export declare namespace env {
      *  @post If and only if the table row is found, `*secondary` will be replaced with the secondary key of the found table row
      *  @return iterator to the table row with a primary key equal to `id` or the end iterator of the table if the table row could not be found
      */
-    function db_idx_double_find_primary(code: account_name, scope: account_name, table: table_name, secondary: usize, primary: u64): i32;
+    function db_idx_double_find_primary(code: capi_name, scope: u64, table: capi_name, secondary: usize, primary: u64): i32;
 
     /**
      *
@@ -702,7 +702,7 @@ export declare namespace env {
      *  @post If and only if the table row is found, `*primary` will be replaced with the primary key of the found table row
      *  @return iterator to the first table row with a secondary key equal to `*secondary` or the end iterator of the table if the table row could not be found
      */
-    function db_idx_double_find_secondary(code: account_name, scope: account_name, table: table_name, secondary: usize, primary: usize): i32;
+    function db_idx_double_find_secondary(code: capi_name, scope: u64, table: capi_name, secondary: usize, primary: usize): i32;
 
     /**
      *
@@ -719,7 +719,7 @@ export declare namespace env {
      *  @post If and only if the table row is found, `*primary` will be replaced with the primary key of the found table row
      *  @return iterator to the found table row or the end iterator of the table if the table row could not be found
      */
-    function db_idx_double_lowerbound(code: account_name, scope: account_name, table: table_name, secondary: usize, primary: usize): i32;
+    function db_idx_double_lowerbound(code: capi_name, scope: u64, table: capi_name, secondary: usize, primary: usize): i32;
 
     /**
      *
@@ -736,7 +736,7 @@ export declare namespace env {
      *  @post If and only if the table row is found, `*primary` will be replaced with the primary key of the found table row
      *  @return iterator to the found table row or the end iterator of the table if the table row could not be found
      */
-    function db_idx_double_upperbound(code: account_name, scope: account_name, table: table_name, secondary: usize, primary: usize): i32;
+    function db_idx_double_upperbound(code: capi_name, scope: u64, table: capi_name, secondary: usize, primary: usize): i32;
 
     /**
      *
@@ -748,7 +748,7 @@ export declare namespace env {
      *  @param table - The table name
      *  @return end iterator of the table
      */
-    function db_idx_double_end(code: account_name, scope: account_name, table: table_name): i32;
+    function db_idx_double_end(code: capi_name, scope: u64, table: capi_name): i32;
 
     /**
      *
@@ -763,7 +763,7 @@ export declare namespace env {
      *  @return iterator to the newly created table row
      *  @post new secondary key association between primary key `id` and secondary key `*secondary` is created in the secondary quadruple-precision floating-point index table
      */
-    function db_idx_long_double_store(scope: account_name, table: table_name, payer: account_name, id: u64, secondary: usize): i32;
+    function db_idx_long_double_store(scope: u64, table: capi_name, payer: capi_name, id: u64, secondary: usize): i32;
 
     /**
      *
@@ -776,7 +776,7 @@ export declare namespace env {
      *  @pre `iterator` points to an existing table row in the table
      *  @post the secondary key of the table row pointed to by `iterator` is replaced by `*secondary`
      */
-    function db_idx_long_double_update(iterator: i32, payer: account_name, secondary: usize): i32;
+    function db_idx_long_double_update(iterator: i32, payer: capi_name, secondary: usize): i32;
 
     /**
      *
@@ -828,7 +828,7 @@ export declare namespace env {
      *  @post If and only if the table row is found, `*secondary` will be replaced with the secondary key of the found table row
      *  @return iterator to the table row with a primary key equal to `id` or the end iterator of the table if the table row could not be found
      */
-    function db_idx_long_double_find_primary(code: account_name, scope: account_name, table: table_name, secondary: usize, primary: u64): i32
+    function db_idx_long_double_find_primary(code: capi_name, scope: u64, table: capi_name, secondary: usize, primary: u64): i32
     ;
 
     /**
@@ -844,7 +844,7 @@ export declare namespace env {
      *  @post If and only if the table row is found, `*primary` will be replaced with the primary key of the found table row
      *  @return iterator to the first table row with a secondary key equal to `*secondary` or the end iterator of the table if the table row could not be found
      */
-    function db_idx_long_double_find_secondary(code: account_name, scope: account_name, table: table_name, ongsecondary: usize, primary: usize): i32;
+    function db_idx_long_double_find_secondary(code: capi_name, scope: u64, table: capi_name, ongsecondary: usize, primary: usize): i32;
 
     /**
      *
@@ -861,7 +861,7 @@ export declare namespace env {
      *  @post If and only if the table row is found, `*primary` will be replaced with the primary key of the found table row
      *  @return iterator to the found table row or the end iterator of the table if the table row could not be found
      */
-    function db_idx_long_double_lowerbound(code: account_name, scope: account_name, table: table_name, secondary: usize, primary: usize): i32;
+    function db_idx_long_double_lowerbound(code: capi_name, scope: u64, table: capi_name, secondary: usize, primary: usize): i32;
 
     /**
      *
@@ -878,7 +878,7 @@ export declare namespace env {
      *  @post If and only if the table row is found, `*primary` will be replaced with the primary key of the found table row
      *  @return iterator to the found table row or the end iterator of the table if the table row could not be found
      */
-    function db_idx_long_double_upperbound(code: account_name, scope: account_name, table: table_name, secondary: usize, primary: usize): i32;
+    function db_idx_long_double_upperbound(code: capi_name, scope: u64, table: capi_name, secondary: usize, primary: usize): i32;
 
     /**
      *
@@ -890,5 +890,5 @@ export declare namespace env {
      *  @param table - The table name
      *  @return end iterator of the table
      */
-    function db_idx_long_double_end(code: account_name, scope: account_name, table: table_name): i32;
+    function db_idx_long_double_end(code: capi_name, scope: u64, table: capi_name): i32;
 }

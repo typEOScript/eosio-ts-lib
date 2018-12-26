@@ -22,7 +22,7 @@ export declare namespace env {
      *  eosio::print("sha256 hash generated from data equals provided hash");
      *  @endcode
      */
-    function assert_sha256( data:usize, length:u32, const capi_checksum256* hash );
+    function assert_sha256(data: usize, length: u32, hash: usize): void;
 
     /**
      *  Tests if the sha1 hash generated from data matches the provided checksum.
@@ -47,7 +47,7 @@ export declare namespace env {
      *  eosio::print("sha1 hash generated from data equals provided hash");
      *  @endcode
      */
-    function assert_sha1( data:usize, length:u32, const capi_checksum160* hash );
+    function assert_sha1(data: usize, length: u32, hash: usize): void;
 
     /**
      *  Tests if the sha512 hash generated from data matches the provided checksum.
@@ -72,7 +72,7 @@ export declare namespace env {
      *  eosio::print("sha512 hash generated from data equals provided hash");
      *  @endcode
      */
-    function assert_sha512( data:usize, length:u32, const capi_checksum512* hash );
+    function assert_sha512(data: usize, length: u32, hash: usize): void;
 
     /**
      *  Tests if the ripemod160 hash generated from data matches the provided checksum.
@@ -96,7 +96,7 @@ export declare namespace env {
      *  eosio::print("ripemod160 hash generated from data equals provided hash");
      *  @endcode
      */
-    function assert_ripemd160( data:usize, length:u32, const capi_checksum160* hash );
+    function assert_ripemd160(data: usize, length: u32, hash: usize): void;
 
     /**
      *  Hashes `data` using `sha256` and stores result in memory pointed to by hash.
@@ -114,7 +114,7 @@ export declare namespace env {
      *  eos_assert( calc_hash == hash, "invalid hash" );
      *  @endcode
      */
-    void sha256( data:usize, length:u32, capi_checksum256* hash );
+    function sha256(data: usize, length: u32, hash: usize): void;
 
     /**
      *  Hashes `data` using `sha1` and stores result in memory pointed to by hash.
@@ -132,7 +132,7 @@ export declare namespace env {
      *  eos_assert( calc_hash == hash, "invalid hash" );
      *  @endcode
      */
-    void sha1( data:usize, length:u32, capi_checksum160* hash );
+    function sha1(data: usize, length: u32, hash: usize): void;
 
     /**
      *  Hashes `data` using `sha512` and stores result in memory pointed to by hash.
@@ -150,7 +150,7 @@ export declare namespace env {
      *  eos_assert( calc_hash == hash, "invalid hash" );
      *  @endcode
      */
-    void sha512( data:usize, length:u32, capi_checksum512* hash );
+    function sha512(data: usize, length: u32, hash: usize): void;
 
     /**
      *  Hashes `data` using `ripemod160` and stores result in memory pointed to by hash.
@@ -168,7 +168,7 @@ export declare namespace env {
      *  eos_assert( calc_hash == hash, "invalid hash" );
      *  @endcode
      */
-    void ripemd160( data:usize, length:u32, capi_checksum160* hash );
+    function ripemd160(data: usize, length: u32, hash: usize): void;
 
     /**
      *  Calculates the public key used for a given signature and hash used to create a message.
@@ -186,7 +186,7 @@ export declare namespace env {
      *  @code
      *  @endcode
      */
-    int recover_key( const capi_checksum256* digest, const char* sig, size_t siglen, char* pub, size_t publen );
+    function recover_key(digest: usize, sig: usize, siglen: usize, pub: usize, publen: usize): i32;
 
     /**
      *  Tests a given public key with the generated key from digest and the signature.
@@ -206,14 +206,14 @@ export declare namespace env {
      *  @code
      *  checksum digest;
      *  char sig;
-     *  size_t siglen;
+     *  siglen:usize;
      *  char pub;
-     *  size_t publen;
+     *  publen:usize;
      *  assert_recover_key( digest, sig, siglen, pub, publen )
      *  // If the given public key does not match with the generated key from digest and the signature, anything below will never fire.
      *  eosio::print("pub key matches the pub key generated from digest");
      *  @endcode
      */
-    function assert_recover_key( const capi_checksum256* digest, const char* sig, size_t siglen, const char* pub, size_t publen );
+    function assert_recover_key(digest: usize, sig: usize, siglen: usize, pub: usize, publen: usize): void;
 
 }

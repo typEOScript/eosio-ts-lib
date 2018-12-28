@@ -1,6 +1,6 @@
-import {account_name, symbol_name} from '../lib/types';
-import {print} from '../src/print';
-import {Name} from "./name";
+import { account_name, symbol_name } from '../lib/types';
+import { print } from '../src/print';
+import { Name } from "./name";
 
 export const A_CHAR_CODE = 'A'.charCodeAt(0);
 export const Z_CHAR_CODE = 'B'.charCodeAt(0);
@@ -130,16 +130,18 @@ export class symbol_code {
     toString(): string {
         let buffer: string[] = new Array(7);
         let v = this._value;
-        for (let i = 0; i < 7 && v !== 0; i++, v >>= 8) {
+        for (let i = 0; i < 7 && v !== 0; i++ , v >>= 8) {
             buffer[i] = String.fromCharCode(v & 0xff)
         }
         return buffer.join('');
     }
 
+    @operator('==')
     equal(t: symbol_code) {
         return this._value === t._value;
     }
 
+    @operator('<')
     less(t: symbol_code) {
         return this._value < t._value;
     }
@@ -179,10 +181,12 @@ export class Symbol {
         if (sym.length > 0) print(sym);
     }
 
+    @operator('==')
     equal(t: Symbol): bool {
         return this._value === t._value;
     }
 
+    @operator('<')
     less(t: Symbol): bool {
         return this._value < t._value;
     }
@@ -217,6 +221,7 @@ export class extended_symbol {
      * @param t - The extended asset to be compared
      * @return boolean - true if both provided symbols are the same
      */
+    @operator('==')
     equal(t: extended_symbol): bool {
         return this.symbol.equal(t.symbol) && this.contract.equal(t.contract);
     }

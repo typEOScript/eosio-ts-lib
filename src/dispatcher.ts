@@ -1,5 +1,5 @@
-import {N, Name} from './name';
-import {env as actionAPI} from '../lib/action';
+import { N, Name } from './name';
+import { env as actionAPI } from '../lib/action';
 import 'assemblyscript/std/assembly/allocator/tlsf'
 
 function dispatch(code: u64, act: u64): bool {

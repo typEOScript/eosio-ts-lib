@@ -1,8 +1,8 @@
-import {env} from "../lib/system";
+import { env } from "../lib/system";
 import eosio_assert = env.eosio_assert;
-import {extended_symbol, Symbol} from "./symbol";
-import {Name} from "./name";
-import {print} from "./print";
+import { extended_symbol, Symbol } from "./symbol";
+import { Name } from "./name";
+import { print } from "./print";
 
 const MAX_AMOUNT: i64 = (1 << 62) - 1;
 const INT64_MIN: i64 = -(1 << 63) + 1;
@@ -74,6 +74,7 @@ export class Asset {
         return new Asset(-this.amount, this.symbol);
     }
 
+    @operator('+')
     add(t: Asset): Asset {
         eosio_assert(this.symbol == t.symbol, "attempt to add asset with different symbol");
         this.amount += t.amount;
@@ -82,6 +83,7 @@ export class Asset {
         return this;
     }
 
+    @operator('-')
     sub(t: Asset): Asset {
         eosio_assert(this.symbol == t.symbol, "attempt to subtract asset with different symbol");
         this.amount -= t.amount;
@@ -90,6 +92,7 @@ export class Asset {
         return this;
     }
 
+    @operator('*')
     mul(a: i64): Asset {
         let tmp = this.amount * a;
         eosio_assert(tmp <= Asset.max_amount, "multiplication overflow");
@@ -98,6 +101,7 @@ export class Asset {
         return this;
     }
 
+    @operator('/')
     div(a: i64): Asset {
         eosio_assert(a != 0, "divide by zero");
         eosio_assert(!(this.amount == INT64_MIN && a == -1), "signed division overflow");
@@ -114,14 +118,14 @@ export class Asset {
      * @return false - otherwise
      * @pre Both asset must have the same symbol
      */
-    compare(t: Asset): u8 {
+    compare(t: Asset): i8 {
         eosio_assert(this.symbol == t.symbol, "comparison of assets with different symbols is not allowed");
-        const res = this.amount - t.amount;
-        if (res > 0) return 1;
-        else if (res < 0) return -1;
+        if (this.amount > t.amount) return 1;
+        else if (this.amount < t.amount) return -1;
         else return 0;
     }
 
+    @operator('==')
     equal(t: Asset): bool {
         return this.symbol.equal(t.symbol) && this.amount === t.amount
     }
@@ -135,6 +139,7 @@ export class Asset {
      * @return false - otherwise
      * @pre Both asset must have the same symbol
      */
+    @operator('!=')
     notEqual(t: Asset): bool {
         return !this.symbol.equal(t.symbol) || this.amount != t.amount;
     }

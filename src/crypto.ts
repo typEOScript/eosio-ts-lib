@@ -1,4 +1,5 @@
-import {unsigned_int} from "./varint";
+import { unsigned_int } from "./varint";
+/// <reference path="../node_modules/assemblyscript/index.d.ts" />
 
 /**
  * EOSIO Public Key
@@ -18,6 +19,7 @@ export class public_key {
      */
     data: u8[];
 
+    @operator('==')
     equal(t: public_key): bool {
         return this.type.equal(t.type) && this.data.toString() === t.data.toString();
     }
@@ -37,6 +39,7 @@ export class signature {
      */
     data: u8[];
 
+    @operator('==')
     equal(t: signature): bool {
         return this.type.equal(t.type) && this.data.toString() === t.data.toString();
     }

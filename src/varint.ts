@@ -21,6 +21,7 @@ export class unsigned_int {
         this.value = v;
     }
 
+    @operator('==')
     equal(v: unsigned_int): bool
     equal(v: u32): bool {
         if (typeof v === 'u32') {
@@ -30,6 +31,7 @@ export class unsigned_int {
         }
     }
 
+    @operator('<')
     less(v: unsigned_int): bool
     less(v: u32): bool {
         if (typeof v === 'u32') {

@@ -1,4 +1,5 @@
-import {Name} from "./name";
+import { Name } from "./name";
+import { public_key } from "./crypto";
 
 export class blockchain_parameters {
     max_block_net_usage: u32;
@@ -55,6 +56,22 @@ export class blockchain_parameters {
  * @brief Maps producer with its signing key
  */
 export class producer_key {
+
+    /**
+       * Name of the producer
+       *
+       * @brief Name of the producer
+       */
     producer_name: Name;
 
+    /**
+       * Block signing key used by this producer
+       *
+       * @brief Block signing key used by this producer
+       */
+    block_signing_key: public_key;
+
+    less(t: producer_key): bool {
+        return this.producer_name.less(t.producer_name);
+    }
 }

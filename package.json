@@ -1,11 +1,18 @@
 {
   "devDependencies": {
     "assemblyscript": "github:AssemblyScript/assemblyscript",
-    "commitizen": "^3.0.5"
+    "commitizen": "^3.0.5",
+    "cz-conventional-changelog": "^2.1.0",
+    "object-assign": "^4.1.1"
   },
   "scripts": {
     "asbuild:untouched": "asc assembly/index.ts -b build/untouched.wasm -t build/untouched.wat --sourceMap --validate --debug",
     "asbuild:optimized": "asc assembly/index.ts -b build/optimized.wasm -t build/optimized.wat --sourceMap --validate --optimize",
     "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }

@@ -1,8 +1,8 @@
-import { env } from "../lib/system";
+import {env} from "../lib/system";
 import eosio_assert = env.eosio_assert;
-import { extended_symbol, Symbol } from "./symbol";
-import { Name } from "./name";
-import { print } from "./print";
+import {extended_symbol, Symbol} from "./symbol";
+import {Name} from "./name";
+import {print} from "./print";
 
 const MAX_AMOUNT: i64 = (1 << 62) - 1;
 const INT64_MIN: i64 = -(1 << 63) + 1;
@@ -198,11 +198,12 @@ export class extended_asset {
     contract: Name;
 
     constructor(v: Asset, s: Name)
-    constructor(v: i64, s: extended_symbol) {
+    constructor(v: i64, s: extended_symbol)
+    constructor(v: any, s: any) {
         if (v instanceof Asset && s instanceof Name) {
             this.quantity = v;
             this.contract = s;
-        } else if (typeof v === 'i64' && s instanceof extended_symbol) {
+        } else if (isInteger<i64>(v) && s instanceof extended_symbol) {
             this.quantity = new Asset(v, s.get_symbol());
             this.contract = s.get_contract();
         }

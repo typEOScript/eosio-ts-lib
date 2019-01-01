@@ -1,0 +1,1 @@
+export function check_transaction_authorization(trx:transa)

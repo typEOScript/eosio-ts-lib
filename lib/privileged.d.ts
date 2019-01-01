@@ -78,6 +78,6 @@ export declare namespace env {
      * Activate new feature
      * @param f - name (identifier) of the feature to be activated
      */
-    function activate_feature(f: i64);
+    function activate_feature(f: i64): void;
 
 }

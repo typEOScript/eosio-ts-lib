@@ -12,20 +12,18 @@ export function print(param: i64): void
 export function print(param: u32): void
 export function print(param: u64): void
 export function print(param: f32): void
-export function print(param: f64): void {
-    const type = typeof param;
-    if (type === 'string') {
+export function print(param: f64): void
+export function print(param: any): void {
+    if (isString<String>(param)) {
         printAPI.prints_l(param, param.length);
-    } else if (type === 'u8') {
+    } else if (isInteger<u8>(param)) {
         prints_l(String.fromCharCode(param), 1);
-    } else if (type === 'i32' || type === 'i64') {
+    } else if (isInteger<i32>(param) || isInteger<i64>(param)) {
         printi(param);
-    } else if (type === 'u32' || type === 'u64') {
+    } else if (isInteger<u32>(param) || isInteger<u64>(param)) {
         printui(param);
-    } else if (type === 'f32') {
+    } else if (isFloat<f32>(param) || isFloat<f64>(param)) {
         printsf(param);
-    } else {
-        printdf(param);
     }
 }
 

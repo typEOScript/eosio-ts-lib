@@ -14,7 +14,7 @@ export function print(param: u64): void
 export function print(param: f32): void
 export function print(param: f64): void
 export function print(param: any): void {
-    if (isString<String>(param)) {
+    if (isString<string>(param)) {
         printAPI.prints_l(param, param.length);
     } else if (isInteger<u8>(param)) {
         prints_l(String.fromCharCode(param), 1);

@@ -1,146 +1,243 @@
 import {env} from "../lib/system";
 import eosio_assert = env.eosio_assert;
+import {Serializable} from "./serializable";
 
-export function unpack<T>(buffer: usize, len: u32): T {
-    let res = new T()
-
+/**
+ * make a DataStream from an existing complex array.
+ * @param arr an array of complex class, which extends Serializable.
+ */
+export function packComplexArray<T extends Serializable>(arr: T[]): Datastream {
+    let len = Datastream.complexArrayPackSize<T>(arr);
+    let data = new Uint8Array(len);
+    let ds = new Datastream(data.buffer, len);
+    ds.writeComplexArray(arr);
+    return ds;
 }
 
-export function unpack<T>(buffer: u8[]): T {
+/**
+ * make a DataStream from an existing basic array.
+ * @param arr an array of basic class, like u8/i8, u16/i16, u32/i32, u64/i64
+ */
+export function packBasicArray<T>(arr: T[]): Datastream {
+    let len: u32 = <u32>arr.length;
+    let bytes = len * sizeof<T>();
+    let array = new Uint8Array(bytes);
+    let ds = new Datastream(array.buffer, bytes);
+    for (let i: u32 = 0; i < len; i++) {
+        ds.write<T>(from[i]);
+    }
+    ds.pos = 0;
+    return ds;
+}
 
+/**
+ * make a DataStream from an existing complex object.
+ * @param target a complex object which extends Serializable.
+ */
+export function packComplex<T extends Serializable>(target: T): Datastream {
+    let len = Datastream.packSize(target);
+    let data = new Uint8Array(len);
+    let ds = new Datastream(data.buffer, len);
+    target.serialize(ds);
+    return ds;
+}
+
+export function unpack<T extends Serializable>(stream: u8[], result: T): T
+export function unpack<T extends Serializable>(stream: Datastream, result: T): T
+export function unpack<T extends Serializable>(stream: any, result: T): T {
+    if (isArray<u8>(stream)) {
+        // bytes array
+        let ds = new Datastream(stream.buffer, stream.byteLength);
+        result.deserialize(ds);
+        return result
+    } else if (stream instanceof Datastream) {
+        result.deserialize(stream);
+        return result
+    }
 }
 
 export class Datastream {
-    private _buffer: u8[];
-    private _pos: usize = 0;
-    private _end: usize;
+    buffer: usize;
+    pos: u32 = 0;
+    len: u32;
+
+    private packSizeMode() {
+        return this.buffer === 0;
+    }
+
+    /**
+     * to measure the length of serialized buffer.
+     * @param obj an instance of class which implements Serializable.
+     */
+    static packSize<T extends Serializable>(obj: T): u32 {
+        let ins = new Datastream(0, 0);
+        obj.serialize(ins);
+
+        return ins.pos;
+    }
+
+    static complexArrayPackSize<T extends Serializable>(arr: T[]): u32 {
+        let ins = new Datastream(0, 0);
+        let len: u32 = <u32>arr.length;
+        ins.writeVarint32(len);
+        for (let i: u32 = 0; i < len; i++) {
+            arr[i].serialize(ins);
+        }
+        return ins.pos;
+    }
 
     /**
      * Construct a new datastream object given the size of the buffer and start position of the buffer
      *
      * @brief Construct a new datastream object
-     * @param s - The size of the buffer
+     * @param buffer - The start position of the buffer
+     * @param len - The size of the buffer
      */
-    constructor(s: usize) {
-        // @ts-ignore
-        this._buffer = new Uint8Array(s);
-        this._end = s;
+    constructor(buffer: usize, len: u32) {
+        this.buffer = buffer;
+        this.len = len;
     }
 
-    skip(s: usize): void {
-        this._pos += s;
+    position(): u32 {
+        return this.pos;
     }
 
-    /**
-     *  Reads a specified number of bytes from the stream into a buffer
-     *
-     *  @brief Reads a specified number of bytes from this stream into a buffer
-     *  @param buffer - The pointer to the destination buffer
-     *  @param len - the number of bytes to read
-     *  @return true
-     */
-    read(buffer: u8[], len: usize): bool {
-        eosio_assert((this._end - this._pos) >= s, "read");
-        this.memcpy(buffer, this._pos, len);
-        this._pos += len;
-        return true;
+    size(): u32 {
+        return this.len;
     }
 
-    /**
-     *  Writes a specified number of bytes into the stream from a buffer
-     *
-     *  @brief Writes a specified number of bytes into the stream from a buffer
-     *  @param buffer - The pointer to the source buffer
-     *  @param len - The number of bytes to write
-     *  @return true
-     */
-    write(buffer: u8[], len: usize): bool {
-        eosio_assert(this._end - this._pos >= len, "write");
-        this.memcpy(buffer, this._pos, len);
-        return true;
+    read<T>(): T {
+        let value: T = load<T>(this.buffer + this.pos);
+        this.pos += sizeof<T>();
+        return value;
     }
 
-    memcpy(buf: u8[], pos: usize, len: usize): void {
-        let buf = new Uint8Array(len);
-        for (let i = 0; i < len; i++) {
-            buf[i] = this._buffer[pos + i];
+    write<T>(value: T): void {
+        if (!this.packSizeMode()) {
+            store<T>(this.buffer + this.pos, value);
+        }
+        this.pos += sizeof<T>();
+    }
+
+    toArray<T>(): T[] {
+        if (this.len == 0) return new Array<T>();
+
+        let len = this.len / sizeof<T>();
+        let arr = new Array<T>(len);
+        let idx = 0;
+        for (let i: u32 = 0; i < len; i++) {
+            let value: T = load<T>(this.buffer + idx);
+            arr[i] = value;
+            idx += sizeof<T>();
+        }
+        return arr;
+    }
+
+    readVarint32(): u32 {
+        let value: u32 = 0;
+        let shift: u32 = 0;
+        let b: u8;
+        do {
+            b = this.read<u8>();
+            value |= <u32>(b & 0x7f) << (7 * shift++);
+        } while (b & 0x80);
+        return value;
+    }
+
+    writeVarint32(value: u32): void {
+        do {
+            let b: u8 = <u8>value & <u8>0x7f;
+            value >>= 7;
+            b |= ((value > 0 ? 1 : 0) << 7);
+            this.write<u8>(b);
+        } while (value);
+    }
+
+    readStringArray(): string[] {
+        let len = this.readVarint32();
+        if (len == 0) return new Array<string>();
+
+        let arr = new Array<string>(len);
+        for (let i: u32 = 0; i < len; i++) {
+            arr[i] = this.readString();
+        }
+        return arr;
+    }
+
+    writeStringArray(arr: string[]): void {
+        let len: u32 = arr.length;
+        this.writeVarint32(len);
+        for (let i: u32 = 0; i < len; i++) {
+            this.writeString(arr[i]);
+        }
+    }
+
+    readArray<T>(): T[] {
+        let len = this.readVarint32();
+        if (len == 0) return new Array<T>();
+
+        let arr = new Array<T>(len);
+        for (let i: u32 = 0; i < len; i++) {
+            // arr[i] = {} as T;
+            arr[i] = this.read<T>();
+        }
+
+        return arr;
+    }
+
+    writeArray<T>(arr: T[]): void {
+        let len: u32 = <u32>arr.length;
+        this.writeVarint32(len);
+        for (let i: u32 = 0; i < len; i++) {
+            this.write<T>(arr[i]);
         }
     }
 
     /**
-     *  Reads a byte from the stream
-     *
-     *  @brief Reads a byte from the stream
-     *  @param c - The reference to destination byte
-     *  @return u8
+     * read array of complex class which implements Serializable interface.
      */
-    get_byte(): u8 {
-        eosio_assert(this._pos < this._end, "get");
-        const c = this._buffer[this._pos];
-        this._pos++;
-        return c;
+    readComplexArray<T extends Serializable>(): T[] {
+        let len = this.readVarint32();
+        if (len == 0) return new Array<T>();
+
+        let arr = new Array<T>(len);
+        for (let i: u32 = 0; i < len; i++) {
+            arr[i].deserialize(this);
+        }
+        return arr;
     }
 
     /**
-     *  Writes a byte into the stream
-     *
-     *  @brief Writes a byte into the stream
-     *  @param c byte to write
-     *  @return true
+     * write array of complex class which implements ISerialzable interface.
      */
-    put(c: u8): bool {
-        eosio_assert(this._pos < this._end, "put");
-        this._buffer[this._pos] = c;
-        this._pos++;
-        return true;
+    writeComplexArray<T extends Serializable>(arr: T[]): void {
+        let len: u32 = <u32>arr.length;
+        this.writeVarint32(len);
+        for (let i: u32 = 0; i < len; i++) {
+            arr[i].serialize(this);
+        }
     }
 
-    /**
-     *  Retrieves the current position of the stream
-     *
-     *  @brief Retrieves the current position of the stream
-     *  @return usize - The current position of the stream
-     */
-    pos(): usize {
-        return this._pos;
+    readString(): string {
+        let len = this.readVarint32();
+        if (len == 0) return "";
+
+        let data = new Uint8Array(len);
+        memory.copy(data.buffer, this.buffer + this.pos, len);
+        this.pos += len;
+        return String.fromUTF8(data.buffer, len);
     }
 
-    valid(): bool {
-        return this._pos <= this._end && this._pos >= 0;
-    }
+    writeString(str: string): void {
+        let len: u32 = <u32>str.lengthUTF8 - 1;
+        this.writeVarint32(len);
+        if (len == 0) return;
 
-    /**
-     *  Sets the position within the current stream
-     *
-     *  @brief Sets the position within the current stream
-     *  @param p - The offset relative to the origin
-     *  @return true if p is within the range
-     *  @return false if p is not within the rawnge
-     */
-    seekp(p: usize): bool {
-        this._pos = p;
-        return this._pos <= this._end;
-    }
-
-    /**
-     *  Gets the position within the current stream
-     *
-     *  @brief Gets the position within the current stream
-     *  @return p - The position within the current stream
-     */
-    tellp(): usize {
-        return this.pos();
-    }
-
-    /**
-     *  Returns the number of remaining bytes that can be read/skipped
-     *
-     *  @brief Returns the number of remaining bytes that can be read/skipped
-     *  @return usize - The number of remaining bytes
-     */
-    remaining(): usize {
-        return this._end - this._pos;
+        if (!this.packSizeMode()) {
+            let ptr = str.toUTF8();
+            memory.copy(this.buffer + this.pos, ptr, len);
+        }
+        this.pos += len;
     }
 
 }
-

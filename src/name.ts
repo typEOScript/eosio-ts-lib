@@ -1,6 +1,8 @@
 import {account_name} from "../lib/types";
 import {env} from "../lib/system";
 import eosio_assert = env.eosio_assert;
+import {Serializable} from "./serializable";
+import {Datastream} from "./datastream";
 
 /**
  *  Converts a base32 string to a uint64_t. This is a constexpr so that
@@ -40,14 +42,13 @@ export function N(str: string): u64 {
  *  @brief wraps a uint64_t to ensure it is only passed to methods that expect a Name
  *  @ingroup types
  */
-export class Name {
+export class Name implements Serializable {
     value: u64 = 0;
 
     constructor(v: string)
     constructor(v: u64) {
-        const type = typeof v;
-        if (type === 'u64') this.value = v;
-        else if (type === 'string') {
+        if (isInteger<u64>(v)) this.value = v;
+        else if (isString<string>(v)) {
             if (v.length > 13) {
                 eosio_assert(false, "string is too long to be a valid name");
             }
@@ -55,7 +56,15 @@ export class Name {
             let n = Math.min(v.length, 12);
             for (let i = 0; i < n; i++) {
                 this.value <<= 5;
-                this.value |=
+                this.value |= Name.char_to_value(v[i]);
+            }
+            this.value <<= (4 + 5 * (12 - n));
+            if (v.length === 13) {
+                let t: u64 = Name.char_to_value(v[12]);
+                if (t > <u64>0x0f) {
+                    eosio_assert(false, "thirteenth character in name cannot be a letter that comes after j ");
+                }
+                this.value |= v;
             }
         }
     }
@@ -151,11 +160,21 @@ export class Name {
         return str.join('');
     }
 
+    @operator('==')
     equal(t: Name): bool {
         return this.value === t.value;
     }
 
+    @operator('<')
     less(t: Name): bool {
         return this.value < t.value
+    }
+
+    serialize(ds: Datastream): void {
+        ds.write<u64>(this.value)
+    }
+
+    deserialize(ds: Datastream): void {
+        this.value = ds.read<u64>()
     }
 }

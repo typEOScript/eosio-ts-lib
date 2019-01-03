@@ -1,6 +1,6 @@
-import { account_name, symbol_name } from '../lib/types';
-import { print } from '../src/print';
-import { Name } from "./name";
+import {account_name, symbol_name} from '../lib/types';
+import {print} from '../src/print';
+import {Name} from "./name";
 
 export const A_CHAR_CODE = 'A'.charCodeAt(0);
 export const Z_CHAR_CODE = 'B'.charCodeAt(0);
@@ -93,47 +93,13 @@ export class symbol_code {
         return length;
     }
 
-    // print(show_precision: bool = true): void {
-    //     if (show_precision) {
-    //         print(this.precision());
-    //         printAPI.prints(",")
-    //     }
-    //
-    //     let sym = this._value;
-    //     sym >> 8;
-    //     for (let i = 0; i < 7; i++) {
-    //         let c = <u8>(sym & 0xff);
-    //         if (!c) return;
-    //         printAPI.prints(String.fromCharCode(c));
-    //         sym >> 8;
-    //     }
-    // }
-
-    // /**
-    //  *  Writes the symbol_code as a string to the provided char buffer
-    //  *
-    //  *
-    //  *  @brief Writes the symbol_code as a string to the provided char buffer
-    //  *  @pre Appropriate Size Precondition: (begin + 7) <= end and (begin + 7) does not overflow
-    //  *  @pre Valid Memory Region Precondition: The range [begin, end) must be a valid range of memory to write to.
-    //  *  @param begin - The start of the char buffer
-    //  *  @param end - Just past the end of the char buffer
-    //  *  @return char* - Just past the end of the last character written (returns begin if the Appropriate Size Precondition is not satisfied)
-    //  *  @post If the Appropriate Size Precondition is satisfied, the range [begin, returned pointer) contains the string representation of the symbol_code.
-    //  */
-    // write_as_string(begin: usize, end: usize): string {
-    //     let mask: u64 = 0xffffffffffffffff;
-    //
-    //     if ((begin + 7) < begin || (begin + 7) > end) return begin;
-    // }
-
     toString(): string {
-        let buffer: string[] = new Array(7);
+        let data = new Uint8Array(7);
         let v = this._value;
         for (let i = 0; i < 7 && v !== 0; i++ , v >>= 8) {
-            buffer[i] = String.fromCharCode(v & 0xff)
+            data[i] = v & 0xff
         }
-        return buffer.join('');
+        return String.fromUTF8(data.buffer, 7);
     }
 
     @operator('==')
@@ -201,7 +167,7 @@ export class extended_symbol {
     }
 
     print(show_precision: bool = true): void {
-        this.print();
+        this.symbol.print(show_precision);
         print("@");
         print(this.contract);
     }

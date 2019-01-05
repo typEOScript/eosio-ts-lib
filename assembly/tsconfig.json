@@ -2,5 +2,10 @@
   "extends": "../node_modules/assemblyscript/std/assembly.json",
   "include": [
     "./**/*.ts"
-  ]
+  ],
+  "compilerOptions": {
+    "target": "ES5",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
+  }
 }

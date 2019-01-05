@@ -1,33 +1,71 @@
-import { N, Name } from './name';
-import { env as actionAPI } from '../lib/action';
-import 'assemblyscript/std/assembly/allocator/tlsf'
+import {N, Name} from './name';
+import {env as actionAPI} from '../lib/action';
+import {Action} from "./action";
+import {Datastream} from "./datastream";
 
 function dispatch(code: u64, act: u64): bool {
 
 }
 
-function execute_action<T, args>(self: Name, code: Name, func: Function): bool {
+/**
+ * execute action with action data.
+ *
+ * @param self
+ * @param code
+ * @param func
+ */
+function execute_action(self: Name, code: Name, func: Function): bool {
     let size: usize = actionAPI.action_data_size();
-
-    const max_stack_buffer_size: usize = 512;
-    let buffer: u8[];
-    if (size > 0) {
-        buffer = new Uint8Array(size);
-        actionAPI.read_action_data(buffer, size)
+    if (size <= 0) {
+        return false
     }
+    // step 1. deserialize action data
+    let data = new Uint8Array(size);
+    actionAPI.read_action_data(data.buffer, size);
+    let ds: Datastream = new Datastream(data.buffer, data.byteLength);
 
-    // TODO: 1. deserialize action data
-
-    // TODO: 2. call action with args
-
+    // step 2. call action with args
+    let paramTypes: any[] = func.paramTypes;
+    let args: any[] = new Array<any>();
+    for (let type of paramTypes) {
+        let tmp = ds.read<type>();
+        args.push(tmp)
+    }
+    func(...args);
     return true
 }
 
-
-export function apply(receiver: u64, code: u64, action: u64): void {
-    if (code === receiver) {
-        switch (action) {
-
+/**
+ * Helper function to create contract apply handler
+ * To be able to use this macro, the contract needs to be derived from eosio::contract
+ *
+ * @brief Convenient macro to create contract apply handler
+ * @param contract - The class of the contract
+ *
+ * Example:
+ * @code
+ * namespace env {
+ *     APPLY(hello);
+ * }
+ * @endcode
+ */
+export function APPLY(contract: any): Function {
+    let actions: string[] = new Array<string>();
+    for (let action in contract) {
+        if (contract.prototype.hasOwnProperty(action)
+            && contract.prototype[action].isAction) {
+            actions.push(action);
+        }
+    }
+    return function apply(receiver: u64, code: u64, action: u64): void {
+        if (code == receiver) {
+            for (let member of actions) {
+                if ((new Name(member)).value == action) {
+                    // execute
+                    execute_action(new Name(receiver), new Name(code), contract[member]);
+                    break
+                }
+            }
         }
     }
 }

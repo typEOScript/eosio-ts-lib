@@ -1,6 +1,16 @@
 import {capi_name} from "./types";
 
 export declare namespace env {
+    /**
+     *  Copy up to @ref len bytes of current action data to the specified location
+     *
+     *  @brief Copy current action data to the specified location
+     *  @param msg - a pointer where up to @ref len bytes of the current action data will be copied
+     *  @param len - len of the current action data to be copied, 0 to report required size
+     *  @return the number of bytes copied to msg, or number of bytes that can be copied if len==0 passed
+     *  @pre `msg` is a valid pointer to a range of memory at least `len` bytes long
+     *  @post `msg` is filled with packed action data
+     */
     function read_action_data(msg: usize, len: u32): u32;
 
     function action_data_size(): u32;

@@ -4,6 +4,53 @@ import {Serializable} from "./serializable";
 import {env as actionAPI} from "../lib/action";
 import {env as assertAPI} from "../lib/system";
 
+/**
+ *
+ *  This method unpacks the current action at type T.
+ *
+ *  @brief Interpret the action body as type T.
+ *  @return Unpacked action data casted as T.
+ *
+ *  Example:
+ *
+ *  @code
+ *  struct dummy_action {
+ *    char a; //1
+ *    unsigned long long b; //8
+ *    int  c; //4
+ *
+ *    EOSLIB_SERIALIZE( dummy_action, (a)(b)(c) )
+ *  };
+ *  dummy_action msg = unpack_action_data<dummy_action>();
+ *  @endcode
+ */
+export function unpack_action_data<T extends Serializable>(result: T): T {
+    const size: u32 = actionAPI.action_data_size();
+    let array = new Uint8Array(size);
+    actionAPI.read_action_data(array.buffer, size);
+    return unpack<T>(array, result);
+}
+
+/**
+ *  Add the specified account to set of accounts to be notified
+ *
+ *  @brief Add the specified account to set of accounts to be notified
+ *  @param notify_account - name of the account to be verified
+ */
+export function require_recipient(notify_account: Name): void {
+    actionAPI.require_recipient(notify_account.value)
+}
+
+/**
+ *  Verifies that @ref name exists in the set of provided auths on a action. Fails if not found.
+ *
+ *  @brief Verify specified account exists in the set of provided auths
+ *  @param name - name of the account to be verified
+ */
+export function require_auth(name: Name): void {
+    actionAPI.require_auth(name.value);
+}
+
 export class permission_level implements Serializable {
     /**
      * Name of the account who owns this permission
@@ -55,6 +102,12 @@ export class permission_level implements Serializable {
     }
 }
 
+/**
+ * This is the packed representation of an action along with
+ * meta-data about the authorization levels.
+ *
+ * @brief Packed representation of an action
+ */
 export class Action<T extends Serializable> implements Serializable {
     /**
      * Name of the account the action is intended for
@@ -97,7 +150,8 @@ export class Action<T extends Serializable> implements Serializable {
      */
     constructor(auth: permission_level, a: Name, n: Name, value: T)
     constructor(auth: permission_level[], a: Name, n: Name, value: T)
-    constructor(auth: any, a: Name, n: Name, value: T) {
+    constructor()
+    constructor(auth?: any, a?: Name, n?: Name, value?: T) {
         if (auth instanceof permission_level) {
             let auths = new Array<permission_level>(1);
             auths.push(auth);
@@ -107,7 +161,7 @@ export class Action<T extends Serializable> implements Serializable {
         }
         this.account = a;
         this.name = n;
-        this.data = packComplex<T>(value).readArray<u8>();
+        if (value) this.data = packComplex<T>(value).readArray<u8>();
     }
 
     serialize(ds: Datastream): void {

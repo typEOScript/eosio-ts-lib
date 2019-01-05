@@ -25,7 +25,7 @@ export class Contract {
      * The datastream for this contract
      *@ The datastream for this contract
      */
-    protected _ds: Datastream = new Datastream(0);
+    protected _ds: Datastream = new Datastream(0, 0);
 
     /**
      * Construct a new contract given the contract name

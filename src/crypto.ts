@@ -1,11 +1,14 @@
-import { unsigned_int } from "./varint";
+import {unsigned_int} from "./varint";
+import {Serializable} from "./serializable";
+import {Datastream} from "./datastream";
+
 /// <reference path="../node_modules/assemblyscript/index.d.ts" />
 
 /**
  * EOSIO Public Key
  * @brief EOSIO Public Key
  */
-export class public_key {
+export class public_key implements Serializable {
     /**
      * Type of the public key, could be either K1 or R1
      * @brief Type of the public key
@@ -23,6 +26,15 @@ export class public_key {
     equal(t: public_key): bool {
         return this.type.equal(t.type) && this.data.toString() === t.data.toString();
     }
+
+    deserialize(ds: Datastream): void {
+
+    }
+
+    serialize(ds: Datastream): void {
+    }
+
+
 }
 
 export class signature {

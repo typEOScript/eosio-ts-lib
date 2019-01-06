@@ -5,3 +5,12 @@ export interface Serializable {
 
     deserialize(ds: Datastream): void;
 }
+
+/**
+ * Table is an interface of records in multi_index database.
+ *
+ */
+export interface Table extends Serializable {
+    primaryKey(): u64;
+}
+

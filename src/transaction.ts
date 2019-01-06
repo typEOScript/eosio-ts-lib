@@ -1,6 +1,7 @@
 import {time_point, time_point_sec} from "./time";
 import {now} from "./system";
 import {unsigned_int} from "./varint";
+import {Action} from "./action";
 
 export class transaction_header {
     expiration: time_point_sec;
@@ -18,6 +19,8 @@ export class transaction_header {
 }
 
 export class transaction extends transaction_header {
+    context_free_actions: Array<Action>;
+
     constructor(exp: time_point_sec = new time_point_sec(now() + 60)) {
         super(exp)
     }
@@ -26,5 +29,4 @@ export class transaction extends transaction_header {
         // TODO
     }
 
-    context_free_actions
 }

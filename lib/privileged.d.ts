@@ -1,3 +1,5 @@
+import {capi_name} from "./types";
+
 export declare namespace env {
     /**
     * @brief Get the resource limits of an account

@@ -27,9 +27,22 @@ function execute_action(self: Name, code: Name, func: Function): bool {
     // step 2. call action with args
     let paramTypes: any[] = func.paramTypes;
     let args: any[] = new Array<any>();
+    // TODO: action data unpack
     for (let type of paramTypes) {
-        let tmp = ds.read<type>();
-        args.push(tmp)
+        let typeChecker = new type();
+        if (isInteger<i32>(typeChecker)) {
+            args.push(ds.read<i32>());
+        } else if (isInteger<i64>(typeChecker)) {
+            args.push(ds.read<i64>());
+        } else if (isInteger<u32>(typeChecker)) {
+            args.push(ds.read<u32>());
+        } else if (isInteger<u64>(typeChecker)) {
+            args.push(ds.read<u64>());
+        } else if (isString(typeChecker)) {
+            args.push(ds.readString());
+        } else if (isArray<type>()) {
+
+        }
     }
     func(...args);
     return true
@@ -44,16 +57,19 @@ function execute_action(self: Name, code: Name, func: Function): bool {
  *
  * Example:
  * @code
+ * class hello{};
+ *
  * namespace env {
  *     APPLY(hello);
  * }
  * @endcode
  */
-export function APPLY(contract: any): Function {
-    let actions: string[] = new Array<string>();
-    for (let action in contract) {
-        if (contract.prototype.hasOwnProperty(action)
-            && contract.prototype[action].isAction) {
+export function APPLY(contract: Function): Function {
+    let actions = new Array<string>();
+    let proto = contract.prototype;
+    for (let action in proto) {
+        if (proto.hasOwnProperty(action)
+            && proto[action].isAction) {
             actions.push(action);
         }
     }
@@ -61,8 +77,8 @@ export function APPLY(contract: any): Function {
         if (code == receiver) {
             for (let member of actions) {
                 if ((new Name(member)).value == action) {
-                    // execute
-                    execute_action(new Name(receiver), new Name(code), contract[member]);
+                    // execute action
+                    execute_action(new Name(receiver), new Name(code), proto[member]);
                     break
                 }
             }

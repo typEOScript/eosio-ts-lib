@@ -41,10 +41,11 @@ export function packComplex<T extends Serializable>(target: T): Datastream {
     return ds;
 }
 
-export function unpack<T extends Serializable>(stream: u8[], result: T): T
-export function unpack<T extends Serializable>(stream: Datastream, result: T): T
-export function unpack<T extends Serializable>(stream: any, result: T): T {
-    if (isArray<u8[]>(stream)) {
+export function unpack<T extends Serializable>(stream: Uint8Array, c: { new(): T }): T
+export function unpack<T extends Serializable>(stream: Datastream, c: { new(): T }): T
+export function unpack<T extends Serializable>(stream: any, c: { new(): T }): T {
+    let result = new c();
+    if (isArray<Uint8Array>(stream)) {
         // bytes array
         let ds = new Datastream(stream.buffer, stream.byteLength);
         result.deserialize(ds);
@@ -239,4 +240,9 @@ export class Datastream {
         this.pos += len;
     }
 
+    bytes(): Uint8Array {
+        let data = new Uint8Array(this.len);
+        memory.copy(data.buffer, this.buffer + this.pos, this.len);
+        return data;
+    }
 }

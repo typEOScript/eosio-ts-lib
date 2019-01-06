@@ -15,10 +15,9 @@ const RETURN_TYPE = 'design:returntype';
  */
 export function ACTION(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
     // mark the func is an action
-    target.prototype[propertyKey].isAction = true;
+    target[propertyKey].isAction = true;
     // get the param types and save as a member
-    target.prototype[propertyKey].paramTypes = Reflect.getMetadata(PARAM_TYPES, target, propertyKey);
+    target[propertyKey].paramTypes = Reflect.getMetadata(PARAM_TYPES, target, propertyKey);
 
-    Object.seal(target.prototype[propertyKey]);
+    Object.seal(target[propertyKey]);
 }
-

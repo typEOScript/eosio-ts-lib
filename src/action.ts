@@ -24,11 +24,11 @@ import {env as assertAPI} from "../lib/system";
  *  dummy_action msg = unpack_action_data<dummy_action>();
  *  @endcode
  */
-export function unpack_action_data<T extends Serializable>(result: T): T {
+export function unpack_action_data<T extends Serializable>(c: { new(): T }): T {
     const size: u32 = actionAPI.action_data_size();
     let array = new Uint8Array(size);
     actionAPI.read_action_data(array.buffer, size);
-    return unpack<T>(array, result);
+    return unpack<T>(array, c);
 }
 
 /**
@@ -135,7 +135,7 @@ export class Action<T extends Serializable> implements Serializable {
      *
      * @brief Payload data
      */
-    data: u8[];
+    data: Uint8Array;
 
 
     /**
@@ -161,7 +161,7 @@ export class Action<T extends Serializable> implements Serializable {
         }
         this.account = a;
         this.name = n;
-        if (value) this.data = packComplex<T>(value).readArray<u8>();
+        if (value) this.data = packComplex<T>(value).bytes();
     }
 
     serialize(ds: Datastream): void {
@@ -207,7 +207,8 @@ export class Action<T extends Serializable> implements Serializable {
      * @tparam TYPE expected type of data
      * @return the action data
      */
-    data_as<TYPE extends Serializable>(result: TYPE): TYPE {
+    data_as<TYPE extends Serializable>(c: { new(): TYPE }): TYPE {
+        let result: TYPE = new c();
         return unpack<TYPE>(this.data, result)
     }
 }

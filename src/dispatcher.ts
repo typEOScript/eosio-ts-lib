@@ -14,7 +14,7 @@ function dispatch(code: u64, act: u64): bool {
  * @param code
  * @param func
  */
-function execute_action(self: Name, code: Name, func: Function): bool {
+function execute_action(func: Function): bool {
     let size: usize = actionAPI.action_data_size();
     if (size <= 0) {
         return false
@@ -25,25 +25,8 @@ function execute_action(self: Name, code: Name, func: Function): bool {
     let ds: Datastream = new Datastream(data.buffer, data.byteLength);
 
     // step 2. call action with args
-    let paramTypes: any[] = func.paramTypes;
     let args: any[] = new Array<any>();
-    // TODO: action data unpack
-    for (let type of paramTypes) {
-        let typeChecker = new type();
-        if (isInteger<i32>(typeChecker)) {
-            args.push(ds.read<i32>());
-        } else if (isInteger<i64>(typeChecker)) {
-            args.push(ds.read<i64>());
-        } else if (isInteger<u32>(typeChecker)) {
-            args.push(ds.read<u32>());
-        } else if (isInteger<u64>(typeChecker)) {
-            args.push(ds.read<u64>());
-        } else if (isString(typeChecker)) {
-            args.push(ds.readString());
-        } else if (isArray<type>()) {
-
-        }
-    }
+    // TODO:
     func(...args);
     return true
 }
@@ -78,7 +61,7 @@ export function APPLY(contract: Function): Function {
             for (let member of actions) {
                 if ((new Name(member)).value == action) {
                     // execute action
-                    execute_action(new Name(receiver), new Name(code), proto[member]);
+                    execute_action(proto[member].bind(contract.prototype));
                     break
                 }
             }

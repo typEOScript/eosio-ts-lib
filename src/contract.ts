@@ -1,4 +1,3 @@
-import {account_name} from "../lib/types";
 import {Name} from "./name";
 import {Datastream} from "./datastream";
 

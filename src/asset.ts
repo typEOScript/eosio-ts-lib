@@ -1,4 +1,4 @@
-import {env} from "../lib/system";
+import {env} from "../lib/system.d";
 import eosio_assert = env.eosio_assert;
 import {extended_symbol, Symbol} from "./symbol";
 import {Name} from "./name";

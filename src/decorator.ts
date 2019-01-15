@@ -1,5 +1,5 @@
 /**
- * ACTION tells the compiler this func is an action in EOSIO contract
+ * action tells the compiler this func is an action in EOSIO contract
  *
  * @param target
  * @param propertyKey
@@ -7,7 +7,7 @@
  * @constructor
  */
 
-export function ACTION(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+export function action(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
     // mark the func is an action
     target[propertyKey].isAction = true;
     Object.seal(target[propertyKey]);

@@ -1,4 +1,4 @@
-import {capi_name} from "./types";
+import {capi_name} from "./types.d";
 
 export declare namespace env {
     /**

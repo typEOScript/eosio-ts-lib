@@ -1,6 +1,5 @@
 import {N, Name} from './name';
-import {env as actionAPI} from '../lib/action';
-import {Action} from "./action";
+import {env as actionAPI} from '../lib/action.d';
 import {Datastream} from "./datastream";
 
 function dispatch(code: u64, act: u64): bool {
@@ -37,20 +36,22 @@ function execute_action(func: Function): bool {
  *
  * @brief Convenient macro to create contract apply handler
  * @param contract - The class of the contract
+ * @param funcName - The array of action names
  *
  * Example:
  * @code
  * class hello{};
  *
  * namespace env {
- *     APPLY(hello);
+ *     export APPLY(hello);
  * }
  * @endcode
  */
-export function APPLY(contract: Function): Function {
+export function APPLY(contract: Function, funcName: Array<string>): Function {
     let actions = new Array<string>();
     let proto = contract.prototype;
-    for (let action in proto) {
+    for (let i = 0; i < funcName.length; i++) {
+        let action = funcName[i];
         if (proto.hasOwnProperty(action)
             && proto[action].isAction) {
             actions.push(action);
@@ -58,7 +59,8 @@ export function APPLY(contract: Function): Function {
     }
     return function apply(receiver: u64, code: u64, action: u64): void {
         if (code == receiver) {
-            for (let member of actions) {
+            for (let i = 0; i < actions.length; i++) {
+                let member = actions[i];
                 if ((new Name(member)).value == action) {
                     // execute action
                     execute_action(proto[member].bind(contract.prototype));

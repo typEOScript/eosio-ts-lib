@@ -1,4 +1,4 @@
-import {env} from "../lib/system";
+import {env} from "../lib/system.d";
 import eosio_assert = env.eosio_assert;
 import {UINT32_MAX} from "../lib/constants";
 

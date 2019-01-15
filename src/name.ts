@@ -1,8 +1,9 @@
-import {account_name} from "../lib/types";
-import {env} from "../lib/system";
-import eosio_assert = env.eosio_assert;
+import {env} from "../lib/system.d";
 import {Serializable} from "./serializable";
 import {Datastream} from "./datastream";
+
+const eosio_assert = env.eosio_assert;
+
 
 /**
  *  Converts a base32 string to a uint64_t. This is a constexpr so that
@@ -14,24 +15,8 @@ import {Datastream} from "./datastream";
  *  @ingroup types
  */
 export function N(str: string): u64 {
-    let len: u32 = str.length;
-    let value: u64 = 0;
-
-    for (let i: u32 = 0; i <= 12; i++) {
-        let c: u64 = 0;
-        if (i < len && i <= 12) {
-            c = char_to_symbol(<u8>str.charCodeAt(i) & 0xff);
-        }
-
-        if (i < 12) {
-            c &= 0x1f;
-            c <<= 64 - 5 * (i + 1);
-        } else {
-            c &= 0x0f;
-        }
-
-        value |= c;
-    }
+    let name = new Name(str);
+    return name.value
 }
 
 /**

@@ -1,6 +1,3 @@
-import {account_name, permission_name} from "../lib/types";
-import {A_CHAR_CODE} from "./symbol";
-
 export class capi_public_key {
     data: u8[] = new Array<u8>(34);
 }
@@ -44,9 +41,3 @@ export class capi_checksum512 {
     //     return true;
     // }
 }
-
-export class account_permission {
-    account: account_name;
-    permission: permission_name;
-}
-

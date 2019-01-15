@@ -1,8 +1,8 @@
 import {blockchain_parameters} from "./privileged";
 import {INT32_MIN} from "../lib/constants";
 import {Datastream} from "./datastream";
-import {env as paramAPI} from "../lib/privileged";
-import {env as assertAPI} from "../lib/system";
+import {env as paramAPI} from "../lib/privileged.d";
+import {env as assertAPI} from "../lib/system.d";
 
 export function sbrk(num_bytes: usize): usize {
     const NBPPL2: u32 = 16;

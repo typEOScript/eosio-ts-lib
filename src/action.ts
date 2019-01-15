@@ -1,8 +1,8 @@
 import {Datastream, packComplex, unpack} from "./datastream";
 import {Name} from "./name";
 import {Serializable} from "./serializable";
-import {env as actionAPI} from "../lib/action";
-import {env as assertAPI} from "../lib/system";
+import {env as actionAPI} from "../lib/action.d";
+import {env as assertAPI} from "../lib/system.d";
 
 /**
  *
@@ -24,11 +24,11 @@ import {env as assertAPI} from "../lib/system";
  *  dummy_action msg = unpack_action_data<dummy_action>();
  *  @endcode
  */
-export function unpack_action_data<T extends Serializable>(c: { new(): T }): T {
+export function unpack_action_data<T extends Serializable>(result: T): T {
     const size: u32 = actionAPI.action_data_size();
     let array = new Uint8Array(size);
     actionAPI.read_action_data(array.buffer, size);
-    return unpack<T>(array, c);
+    return unpack<T>(array, result);
 }
 
 /**
@@ -148,9 +148,9 @@ export class Action<T extends Serializable> implements Serializable {
      * @param n - The name of the action
      * @param value - The action struct that will be serialized via pack into data
      */
+    constructor()
     constructor(auth: permission_level, a: Name, n: Name, value: T)
     constructor(auth: permission_level[], a: Name, n: Name, value: T)
-    constructor()
     constructor(auth?: any, a?: Name, n?: Name, value?: T) {
         if (auth instanceof permission_level) {
             let auths = new Array<permission_level>(1);
@@ -207,8 +207,7 @@ export class Action<T extends Serializable> implements Serializable {
      * @tparam TYPE expected type of data
      * @return the action data
      */
-    data_as<TYPE extends Serializable>(c: { new(): TYPE }): TYPE {
-        let result: TYPE = new c();
-        return unpack<TYPE>(this.data, result)
+    data_as<T extends Serializable>(result: T): T {
+        return unpack<T>(this.data, result)
     }
 }

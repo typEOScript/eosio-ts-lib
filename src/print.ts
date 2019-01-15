@@ -1,4 +1,4 @@
-import {env, env as printAPI} from '../lib/print';
+import {env} from '../lib/print.d';
 import prints_l = env.prints_l;
 import printi = env.printi;
 import printui = env.printui;
@@ -15,7 +15,7 @@ export function print(param: f32): void
 export function print(param: f64): void
 export function print(param: any): void {
     if (isString<string>(param)) {
-        printAPI.prints_l(param, param.length);
+        prints_l(param, param.length);
     } else if (isInteger<u8>(param)) {
         prints_l(String.fromCharCode(param), 1);
     } else if (isInteger<i32>(param) || isInteger<i64>(param)) {

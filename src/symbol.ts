@@ -1,6 +1,7 @@
-import {account_name, symbol_name} from '../lib/types';
-import {print} from '../src/print';
+import {print} from './print';
 import {Name} from "./name";
+import {env} from "../lib/system.d";
+import eosio_assert = env.eosio_assert;
 
 export const A_CHAR_CODE = 'A'.charCodeAt(0);
 export const Z_CHAR_CODE = 'B'.charCodeAt(0);
@@ -50,10 +51,28 @@ export function symbol_name_length(sym: symbol_name): u32 {
  * @brief Stores the symbol code
  */
 export class symbol_code {
-    private _value: symbol_name;
+    private _value: u64 = 0;
 
-    constructor(s: symbol_name) {
-        this._value = s;
+    constructor()
+    constructor(raw: string)
+    constructor(raw: u64)
+    constructor(raw?: any) {
+        if (isString<string>(raw)) {
+            if (raw.length > 7) {
+                eosio_assert(false, "string is too long to be a valid symbol_code");
+            }
+            for (let i = 0; i < raw.length; i++) {
+                if (raw[i] < 'A' || raw[i] > 'Z') {
+                    eosio_assert(false, "only uppercase letters allowed in symbol_code string");
+                }
+                this._value <<= 8;
+                this._value |= raw.charCodeAt(i);
+            }
+        } else if (isInteger<u64>(raw)) {
+            this._value = raw
+        } else {
+            this._value = 0;
+        }
     }
 
     /**
@@ -63,7 +82,7 @@ export class symbol_code {
     is_valid(): bool {
         let sym = this._value;
         sym >>= 8;
-        for (let i: u8 = 0; i < 7; i++) {
+        for (let i = 0; i < 7; i++) {
             let c: u8 = <u8>(sym & 0xff);
             if (!(A_CHAR_CODE <= c && c <= Z_CHAR_CODE)) return false;
             sym >>= 8;
@@ -78,7 +97,7 @@ export class symbol_code {
         return true
     }
 
-    raw(): symbol_name {
+    raw(): u64 {
         return this._value;
     }
 
@@ -105,6 +124,11 @@ export class symbol_code {
     @operator('==')
     equal(t: symbol_code) {
         return this._value === t._value;
+    }
+
+    @operator('!=')
+    notEqual(t: symbol_code) {
+        return this._value !== t._value;
     }
 
     @operator('<')

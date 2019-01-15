@@ -1,4 +1,3 @@
-import {env} from "../lib/system";
 import {Serializable} from "./serializable";
 
 /**
@@ -41,10 +40,9 @@ export function packComplex<T extends Serializable>(target: T): Datastream {
     return ds;
 }
 
-export function unpack<T extends Serializable>(stream: Uint8Array, c: { new(): T }): T
-export function unpack<T extends Serializable>(stream: Datastream, c: { new(): T }): T
-export function unpack<T extends Serializable>(stream: any, c: { new(): T }): T {
-    let result = new c();
+export function unpack<T extends Serializable>(stream: Uint8Array, result: T): T
+export function unpack<T extends Serializable>(stream: Datastream, result: T): T
+export function unpack<T extends Serializable>(stream: any, result: T): T {
     if (isArray<Uint8Array>(stream)) {
         // bytes array
         let ds = new Datastream(stream.buffer, stream.byteLength);
@@ -61,7 +59,7 @@ export class Datastream {
     pos: u32 = 0;
     len: u32;
 
-    private packSizeMode() {
+    private packSizeMode(): bool {
         return this.buffer === 0;
     }
 

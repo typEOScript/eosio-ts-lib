@@ -40,18 +40,27 @@ export function packComplex<T extends Serializable>(target: T): Datastream {
     return ds;
 }
 
-export function unpack<T extends Serializable>(stream: Uint8Array, result: T): T
-export function unpack<T extends Serializable>(stream: Datastream, result: T): T
-export function unpack<T extends Serializable>(stream: any, result: T): T {
-    if (isArray<Uint8Array>(stream)) {
-        // bytes array
-        let ds = new Datastream(stream.buffer, stream.byteLength);
-        result.deserialize(ds);
-        return result
-    } else if (stream instanceof Datastream) {
-        result.deserialize(stream);
-        return result
-    }
+/**
+ * upack data from a bytes array buffer as T
+ *
+ * @param stream
+ * @param result
+ */
+export function unpackBytes<T extends Serializable>(stream: Uint8Array, result: T): T {
+    let ds = new Datastream(stream.buffer, stream.byteLength);
+    result.deserialize(ds);
+    return result
+}
+
+/**
+ * unpack data from a datastream as T
+ *
+ * @param stream
+ * @param result
+ */
+export function unpackDatastream<T extends Serializable>(stream: Datastream, result: T): T {
+    result.deserialize(stream);
+    return result;
 }
 
 export class Datastream {

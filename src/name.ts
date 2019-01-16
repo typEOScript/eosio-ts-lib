@@ -30,28 +30,30 @@ export function N(str: string): u64 {
 export class Name implements Serializable {
     value: u64 = 0;
 
-    constructor(v: string)
-    constructor(v: u64) {
-        if (isInteger<u64>(v)) this.value = v;
-        else if (isString<string>(v)) {
-            if (v.length > 13) {
+    // only provide type u64 and string.
+    static from<T>(arg: T): Name {
+        let name = new Name();
+        if (isInteger<u64>(arg)) name.value = arg;
+        else if (isString<string>(arg)) {
+            if (arg.length > 13) {
                 eosio_assert(false, "string is too long to be a valid name");
             }
 
-            let n = Math.min(v.length, 12);
+            let n = Math.min(arg.length, 12);
             for (let i = 0; i < n; i++) {
-                this.value <<= 5;
-                this.value |= Name.char_to_value(v[i]);
+                name.value <<= 5;
+                name.value |= Name.char_to_value(arg[i]);
             }
-            this.value <<= (4 + 5 * (12 - n));
-            if (v.length === 13) {
-                let t: u64 = Name.char_to_value(v[12]);
+            name.value <<= (4 + 5 * (12 - n));
+            if (arg.length === 13) {
+                let t: u64 = Name.char_to_value(arg[12]);
                 if (t > <u64>0x0f) {
                     eosio_assert(false, "thirteenth character in name cannot be a letter that comes after j ");
                 }
-                this.value |= v;
+                name.value |= t;
             }
         }
+        return name;
     }
 
     /**
@@ -111,14 +113,14 @@ export class Name implements Serializable {
         }
 
         if (remaining_bits_after_last_actual_dot === 0) {
-            return new Name(this.value);
+            return Name.from<u64>(this.value);
         }
 
         let mask: u64 = (<u64>1 << remaining_bits_after_last_actual_dot) - 16;
         let shift: u64 = 64 - remaining_bits_after_last_actual_dot;
 
         // @ts-ignore
-        return new Name(((this.value & mask) << shift) + (thirteenth_character << (shift - 1)));
+        return Name.from<u64>(((this.value & mask) << shift) + (thirteenth_character << (shift - 1)));
     }
 
     raw(): u64 {
